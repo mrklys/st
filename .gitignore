@@ -1,0 +1,9 @@
+# Binary Files
+/st
+
+# Object Files
+*.o
+
+# Patch Files
+*.orig
+*.rej
