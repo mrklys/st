@@ -215,8 +215,8 @@ static Shortcut shortcuts[] = {
 	{ MODKEY,               XK_minus,       chgalpha,       {.f = -1} }, /* Decrease opacity */
 	{ MODKEY,               XK_equal,       chgalpha,       {.f = +1} }, /* Increase opacity */
 	{ MODKEY,               XK_0,           chgalpha,       {.f =  0} }, /* Reset opacity */
-	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
-	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+	{ XK_NO_MOD,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ XK_NO_MOD,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
 /*
