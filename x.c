@@ -813,6 +813,19 @@ xloadcolor(int i, const char *name, Color *ncolor)
 	return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
 }
 
+static void
+xloadalpha(void)
+{
+	unsigned int rgbvalue = strtoul(*(&colorname[defaultbg])+1, NULL, 16);
+	XRenderColor color = { 
+		.alpha = (unsigned short)(0xFFFF * alpha),
+		.red   = (unsigned short)(((rgbvalue & 0xFF0000) >> 8) * alpha),
+		.green = (unsigned short)((rgbvalue & 0x00FF00) * alpha),
+		.blue  = (unsigned short)(((rgbvalue & 0x0000FF) << 8) * alpha)
+	};
+	XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &color, &dc.col[defaultbg]);
+}
+
 void
 xloadcols(void)
 {
@@ -836,9 +849,7 @@ xloadcols(void)
 				die("could not allocate color %d\n", i);
 		}
 
-	dc.col[defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
-	dc.col[defaultbg].pixel &= 0x00FFFFFF;
-	dc.col[defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
+	xloadalpha();
 	loaded = 1;
 }
 
@@ -870,9 +881,7 @@ xsetcolorname(int x, const char *name)
 	dc.col[x] = ncolor;
 
 	if (x == defaultbg) {
-		dc.col[defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
-		dc.col[defaultbg].pixel &= 0x00FFFFFF;
-		dc.col[defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
+		xloadalpha();
 	}
 
 	return 0;
@@ -1428,19 +1437,20 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
 void
 chgalpha(const Arg *arg)
 {
-   if (arg->f == -1.0f && alpha >= 0.1f)
-      alpha -= 0.1f;
-   else if (arg->f == 1.0f && alpha < 1.0f)
-      alpha += 0.1f;
-   else if (arg->f == 0.0f)
-      alpha = alpha_def;
-   else
-      return;
+	if (arg->f == -1.0f && round(alpha * 100) >= 5)
+		alpha -= 0.05f;
+	else if (arg->f == 1.0f && round(alpha * 100) < 100)
+		alpha += 0.05f;
+	else if (arg->f == 0.0f)
+		alpha = alpha_def;
+	else
+		return;
 
-   dc.col[defaultbg].color.alpha = (unsigned short)(0xFFFF * alpha);
-   /* Required to remove artifacting from borderpx */
-   cresize(0, 0);
-   redraw();
+	xloadalpha();
+
+	/* Required to remove artifacting from borderpx */
+	cresize(0, 0);
+	redraw();
 }
 
 void
