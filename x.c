@@ -1455,7 +1455,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
 void
 chgalpha(const Arg *arg)
 {
-	switch ((int)round(arg->f)) {
+	switch (arg->i) {
 		case 0:
 			alpha = alpha_def;
 			break;
