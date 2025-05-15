@@ -267,10 +267,21 @@ static uint buttons; /* bit field of pressed buttons */
 static int cursorblinks = 0;
 static int bellon = 0; /* visual bell status */
 
+/*
+ * Dynamic Copy with Ctrl+C.
+ * Copies the selected text and clears the selection.
+ * When no text is selected, sends SIGINT.
+ */
 void
 clipcopydynamic(const Arg *dummy)
 {
-	fprintf(stderr, "clipcopydynamic: CALL\n");
+	if (selectedany()) {
+		clipcopy(NULL);
+		selclear();
+	} else {
+		/* send SIGINT */ 
+		ttywrite("\x03", sizeof("\x03") - 1, 0);
+	}
 }
 
 void
