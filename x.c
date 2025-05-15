@@ -52,6 +52,7 @@ typedef struct {
 
 /* function definitions used in config.h */
 static void clipcopy(const Arg *);
+static void clipcopydynamic(const Arg *);
 static void clippaste(const Arg *);
 static void numlock(const Arg *);
 static void selpaste(const Arg *);
@@ -265,6 +266,23 @@ static char *opt_title = NULL;
 static uint buttons; /* bit field of pressed buttons */
 static int cursorblinks = 0;
 static int bellon = 0; /* visual bell status */
+
+/*
+ * Dynamic Copy with Ctrl+C.
+ * Copies the selected text and clears the selection.
+ * When no text is selected, sends SIGINT.
+ */
+void
+clipcopydynamic(const Arg *dummy)
+{
+	if (selectedany()) {
+		clipcopy(NULL);
+		selclear();
+	} else {
+		/* send SIGINT */ 
+		ttywrite("\x03", sizeof("\x03") - 1, 0);
+	}
+}
 
 void
 clipcopy(const Arg *dummy)

@@ -509,6 +509,12 @@ selnormalize(void)
 }
 
 int
+selectedany(void)
+{
+	return sel.ob.x != -1;
+}
+
+int
 selected(int x, int y)
 {
 	if (sel.mode == SEL_EMPTY || sel.ob.x == -1 ||

@@ -105,6 +105,7 @@ void selinit(void);
 void selstart(int, int, int);
 void selextend(int, int, int, int);
 int selected(int, int);
+int selectedany(void);
 char *getsel(void);
 
 void highlighturlsline(int);
