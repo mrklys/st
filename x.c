@@ -819,9 +819,9 @@ xloadalpha(void)
 	unsigned int rgbvalue = strtoul(*(&colorname[defaultbg])+1, NULL, 16);
 	XRenderColor color = { 
 		.alpha = (unsigned short)(0xFFFF * alpha),
-		.red   = (unsigned short)(((rgbvalue & 0xFF0000) >> 8) * alpha),
-		.green = (unsigned short)((rgbvalue & 0x00FF00) * alpha),
-		.blue  = (unsigned short)(((rgbvalue & 0x0000FF) << 8) * alpha)
+		.red   = (unsigned short)(TRUERED(rgbvalue)   * alpha),
+		.green = (unsigned short)(TRUEGREEN(rgbvalue) * alpha),
+		.blue  = (unsigned short)(TRUEBLUE(rgbvalue)  * alpha)
 	};
 	XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &color, &dc.col[defaultbg]);
 }
@@ -1437,14 +1437,19 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
 void
 chgalpha(const Arg *arg)
 {
-	if (arg->f == -1.0f && round(alpha * 100) >= 5)
-		alpha -= 0.05f;
-	else if (arg->f == 1.0f && round(alpha * 100) < 100)
-		alpha += 0.05f;
-	else if (arg->f == 0.0f)
-		alpha = alpha_def;
-	else
-		return;
+	switch ((int)round(arg->f)) {
+		case 0:
+			alpha = alpha_def;
+			break;
+		case -1:
+			alpha = (alpha >= 0.05f) ? alpha - 0.05f : 0.0f;
+			break;
+		case 1:
+			alpha = (alpha <= 0.95f) ? alpha + 0.05f : 1.0f;
+			break;
+		default:
+			return;
+	}
 
 	xloadalpha();
 
